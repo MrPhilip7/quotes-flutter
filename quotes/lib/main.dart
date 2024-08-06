@@ -12,19 +12,52 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'Quotes',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-        ),
-        home: MyHomePage(),
+      child: Consumer<MyAppState>(
+        builder: (context, appState, child) {
+          return MaterialApp(
+            title: 'Quotes',
+            theme: ThemeData(
+              brightness: appState.isDarkMode ? Brightness.dark : Brightness.light,
+              primaryColor: appState.isDarkMode ? Colors.black : Colors.white,
+              scaffoldBackgroundColor: appState.isDarkMode ? Colors.black : Colors.white,
+              colorScheme: appState.isDarkMode
+                  ? ColorScheme.dark(
+                      primary: Colors.white,
+                      onPrimary: Colors.black,
+                      secondary: Colors.grey,
+                      onSecondary: Colors.black,
+                      background: Colors.black,
+                      onBackground: Colors.white,
+                      surface: Colors.grey[800]!,
+                      onSurface: Colors.white,
+                    )
+                  : ColorScheme.light(
+                      primary: Colors.black,
+                      onPrimary: Colors.white,
+                      secondary: Colors.grey,
+                      onSecondary: Colors.white,
+                      background: Colors.white,
+                      onBackground: Colors.black,
+                      surface: Colors.grey[200]!,
+                      onSurface: Colors.black,
+                    ),
+            ),
+            home: MyHomePage(),
+          );
+        },
       ),
     );
   }
 }
 
 class MyAppState extends ChangeNotifier {
+  bool isDarkMode = false;
+
+  void toggleTheme() {
+    isDarkMode = !isDarkMode;
+    notifyListeners();
+  }
+
   List<String> quotes = [
     "The greatest glory in living lies not in never falling, but in rising every time we fall. - Nelson Mandela",
     "The way to get started is to quit talking and begin doing. - Walt Disney",
@@ -76,38 +109,44 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         page = LikedPage();
         break;
+      case 2:
+        page = SettingsPage();
+        break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
 
     return Scaffold(
-      body: Row(
+      body: Column(
         children: [
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.background,
+              child: page,
+            ),
+          ),
           SafeArea(
-            child: NavigationRail(
-              extended: false,
-              destinations: [
-                NavigationRailDestination(
+            child: BottomNavigationBar(
+              items: [
+                BottomNavigationBarItem(
                   icon: Icon(Icons.home),
-                  label: Text('Home'),
+                  label: 'Home',
                 ),
-                NavigationRailDestination(
+                BottomNavigationBarItem(
                   icon: Icon(Icons.favorite),
-                  label: Text('Favorites'),
+                  label: 'Favorites',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.settings),
+                  label: 'Settings',
                 ),
               ],
-              selectedIndex: selectedIndex,
-              onDestinationSelected: (value) {
+              currentIndex: selectedIndex,
+              onTap: (value) {
                 setState(() {
                   selectedIndex = value;
                 });
               },
-            ),
-          ),
-          Expanded(
-            child: Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: page,
             ),
           ),
         ],
@@ -184,6 +223,23 @@ class LikedPage extends StatelessWidget {
             title: Text(quote),
           ),
       ],
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    return Center(
+      child: SwitchListTile(
+        title: Text('Dark Mode'),
+        value: appState.isDarkMode,
+        onChanged: (value) {
+          appState.toggleTheme();
+        },
+      ),
     );
   }
 }
