@@ -168,11 +168,17 @@ class GeneratorPage extends StatelessWidget {
       icon = Icons.favorite_border;
     }
 
+    // Wybierz kolor dla BigCard
+    Color cardColor = appState.isDarkMode ? const Color.fromARGB(255, 233, 236, 239) : Color.fromARGB(255, 73, 80, 87);
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          BigCard(quote: quote),
+          BigCard(
+            quote: quote,
+            color: cardColor, // Przekaż kolor do BigCard
+          ),
           SizedBox(height: 10),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -198,6 +204,7 @@ class GeneratorPage extends StatelessWidget {
     );
   }
 }
+
 
 class LikedPage extends StatelessWidget {
   @override
@@ -248,9 +255,11 @@ class BigCard extends StatelessWidget {
   const BigCard({
     super.key,
     required this.quote,
+    required this.color, // Dodaj parametr koloru
   });
 
   final String quote;
+  final Color color; // Dodaj pole koloru
 
   @override
   Widget build(BuildContext context) {
@@ -260,7 +269,7 @@ class BigCard extends StatelessWidget {
     );
 
     return Card(
-      color: theme.colorScheme.primary,
+      color: color, // Użyj koloru przekazanego w konstruktorze
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Text(
@@ -272,3 +281,4 @@ class BigCard extends StatelessWidget {
     );
   }
 }
+
