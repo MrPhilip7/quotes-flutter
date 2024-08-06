@@ -1,4 +1,3 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,10 +13,10 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'quotes',
+        title: 'Quotes',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         ),
         home: MyHomePage(),
       ),
@@ -26,20 +25,33 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
+  List<String> quotes = [
+    "The greatest glory in living lies not in never falling, but in rising every time we fall. - Nelson Mandela",
+    "The way to get started is to quit talking and begin doing. - Walt Disney",
+    "Your time is limited, so don’t waste it living someone else’s life. - Steve Jobs",
+    "If life were predictable it would cease to be life, and be without flavor. - Eleanor Roosevelt",
+    "If you look at what you have in life, you'll always have more. - Oprah Winfrey",
+    "If you set your goals ridiculously high and it's a failure, you will fail above everyone else's success. - James Cameron",
+    "Life is what happens when you're busy making other plans. - John Lennon",
+  ];
+
+  String current = "";
+
+  MyAppState() {
+    getNext();
+  }
 
   void getNext() {
-    current = WordPair.random();
+    current = (quotes..shuffle()).first;
     notifyListeners();
   }
-  
-  var favorites = <WordPair>[]; //list
 
-  void toggleFavorite(){
-    if(favorites.contains(current)){
+  var favorites = <String>[]; // list of favorite quotes
+
+  void toggleFavorite() {
+    if (favorites.contains(current)) {
       favorites.remove(current);
-    }
-    else{
+    } else {
       favorites.add(current);
     }
     notifyListeners();
@@ -54,7 +66,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var selectedIndex = 0;
 
-    @override
+  @override
   Widget build(BuildContext context) {
     Widget page;
     switch (selectedIndex) {
@@ -71,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Row(
         children: [
-          SafeArea(          
+          SafeArea(
             child: NavigationRail(
               extended: false,
               destinations: [
@@ -88,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onDestinationSelected: (value) {
                 setState(() {
                   selectedIndex = value;
-                });           
+                });
               },
             ),
           ),
@@ -104,15 +116,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-
 class GeneratorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var pair = appState.current;
+    var quote = appState.current;
 
     IconData icon;
-    if (appState.favorites.contains(pair)) {
+    if (appState.favorites.contains(quote)) {
       icon = Icons.favorite;
     } else {
       icon = Icons.favorite_border;
@@ -122,7 +133,7 @@ class GeneratorPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          BigCard(pair: pair),
+          BigCard(quote: quote),
           SizedBox(height: 10),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -150,7 +161,7 @@ class GeneratorPage extends StatelessWidget {
 }
 
 class LikedPage extends StatelessWidget {
-   @override
+  @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
 
@@ -167,10 +178,10 @@ class LikedPage extends StatelessWidget {
           child: Text('You have '
               '${appState.favorites.length} favorites:'),
         ),
-        for (var pair in appState.favorites)
+        for (var quote in appState.favorites)
           ListTile(
             leading: Icon(Icons.favorite),
-            title: Text(pair.asLowerCase),
+            title: Text(quote),
           ),
       ],
     );
@@ -180,15 +191,14 @@ class LikedPage extends StatelessWidget {
 class BigCard extends StatelessWidget {
   const BigCard({
     super.key,
-    required this.pair,
+    required this.quote,
   });
 
-  final WordPair pair;
+  final String quote;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // ↓ Add this.
     final style = theme.textTheme.displayMedium!.copyWith(
       color: theme.colorScheme.onPrimary,
     );
@@ -197,10 +207,10 @@ class BigCard extends StatelessWidget {
       color: theme.colorScheme.primary,
       child: Padding(
         padding: const EdgeInsets.all(20),
-        // ↓ Change this line.
-        child: Text(pair.asLowerCase, 
-        style: style,
-        semanticsLabel: pair.asPascalCase,
+        child: Text(
+          quote,
+          style: style,
+          textAlign: TextAlign.center,
         ),
       ),
     );
