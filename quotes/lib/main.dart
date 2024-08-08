@@ -129,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: BottomNavigationBar(
               items: [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
+                  icon: Icon(Icons.format_quote),
                   label: 'Home',
                 ),
                 BottomNavigationBarItem(
